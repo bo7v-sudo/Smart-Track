@@ -9,7 +9,6 @@ import { AuthField } from '@/components/auth/form-fields';
 import { GoogleButton, AuthDivider, SubmitButton } from '@/components/auth/auth-buttons';
 import { supabase } from '@/lib/supabase-client';
 import { useAuth } from '@/components/auth/auth-provider';
-import type { UserRole } from '@/components/auth/auth-provider';
 
 function mapAuthError(message: string): string {
   if (message.includes('Invalid login credentials')) {
@@ -58,21 +57,11 @@ export default function LoginPage() {
     }
 
     if (data.user) {
-      await refreshProfile(data.user.id);
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('role, onboarding_completed')
-        .eq('id', data.user.id)
-        .maybeSingle();
-
-      const role = (profileData?.role as UserRole) ?? 'student';
-      if (role === 'professor') {
-        router.push('/professor');
-      } else if (!profileData?.onboarding_completed) {
-        router.push('/onboarding');
-      } else {
-        router.push('/dashboard');
-      }
+      // Kick off profile fetch in the background (don't block the redirect)
+      refreshProfile(data.user.id);
+      // Redirect all users straight to the dashboard
+      router.replace('/dashboard');
+      return;
     }
     setLoading(false);
   };

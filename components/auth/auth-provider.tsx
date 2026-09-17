@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = React.useState<Profile | null>(null);
   const [loading, setLoading] = React.useState(true);
 
-  const fetchProfile = React.useCallback(async (userId: string) => {
+  const fetchProfile = React.useCallback(async (userId: string): Promise<Profile | null> => {
     const { data, error } = await supabase
       .from('profiles')
       .select('id, email, full_name, role, avatar_url, onboarding_completed')
@@ -49,18 +49,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (error) {
       console.error('Failed to load profile:', error.message);
-      return;
     }
-    if (data) {
-      setProfile(data as Profile);
-    }
+
+    const result: Profile = (data as Profile) ?? {
+      id: userId,
+      email: null,
+      full_name: null,
+      role: 'student',
+      avatar_url: null,
+      onboarding_completed: false,
+    };
+    setProfile(result);
+    return result;
   }, []);
 
   const refreshProfile = React.useCallback(async (userId?: string): Promise<Profile | null> => {
     const uid = userId ?? session?.user?.id;
     if (!uid) return null;
-    await fetchProfile(uid);
-    return null;
+    return fetchProfile(uid);
   }, [session, fetchProfile]);
 
   React.useEffect(() => {
@@ -79,16 +85,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, newSession) => {
+      (event, newSession) => {
+        // Skip INITIAL_SESSION — getSession() already handles it
+        if (event === 'INITIAL_SESSION') return;
+
+        if (!mounted) return;
+
         setSession(newSession);
         if (newSession?.user) {
           (async () => {
             await fetchProfile(newSession.user.id);
+            if (mounted) setLoading(false);
           })();
         } else {
           setProfile(null);
+          setLoading(false);
         }
-        setLoading(false);
       },
     );
 

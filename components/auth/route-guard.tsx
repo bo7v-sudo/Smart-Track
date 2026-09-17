@@ -2,22 +2,20 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth, type UserRole } from '@/components/auth/auth-provider';
+import { useAuth } from '@/components/auth/auth-provider';
 
 /**
- * Wraps a protected route. Redirects to /login when unauthenticated and
- * to the role-appropriate page when the user's role does not match the
- * `require` prop. Shows a loading state while the session resolves.
+ * Wraps a protected route. Redirects to /login when unauthenticated.
+ * Shows a loading state only while the session is being resolved.
  */
 export function RouteGuard({
   children,
-  require = 'student',
 }: {
   children: React.ReactNode;
-  require?: UserRole;
+  require?: 'student' | 'professor';
 }) {
   const router = useRouter();
-  const { session, role, profile, loading } = useAuth();
+  const { session, loading } = useAuth();
   const [redirecting, setRedirecting] = React.useState(false);
 
   React.useEffect(() => {
@@ -26,21 +24,8 @@ export function RouteGuard({
     if (!session) {
       setRedirecting(true);
       router.replace('/login');
-      return;
     }
-
-    if (role && role !== require) {
-      setRedirecting(true);
-      router.replace(role === 'professor' ? '/professor' : '/dashboard');
-      return;
-    }
-
-    // Students must complete onboarding before accessing the dashboard
-    if (require === 'student' && profile && !profile.onboarding_completed) {
-      setRedirecting(true);
-      router.replace('/onboarding');
-    }
-  }, [loading, session, role, require, profile, router]);
+  }, [loading, session, router]);
 
   if (loading || redirecting) {
     return (
