@@ -23,7 +23,7 @@ const initialMessages: ChatMessage[] = [
   {
     id: 0,
     role: 'ai',
-    text: "Hey Alex! I am your AI study assistant. I can summarize lectures, build study plans, generate quizzes, and predict your GPA. What do you need help with today?",
+    text: "Hi! I'm your AI assistant. I can help with anything — coding, writing, general knowledge, problem-solving, casual conversation, and of course academic and study help. What can I do for you today?",
   },
 ];
 
@@ -89,7 +89,7 @@ export function AIChat({
                   <Sparkles className="h-5 w-5" />
                 </span>
                 <div>
-                  <p className="text-sm font-semibold">AI Study Assistant</p>
+                  <p className="text-sm font-semibold">AI Assistant</p>
                   <p className="flex items-center gap-1 text-xs text-accent">
                     <span className="h-1.5 w-1.5 rounded-full bg-accent" />
                     Online
@@ -152,7 +152,7 @@ export function AIChat({
                     }
                   }}
                   rows={1}
-                  placeholder="Ask anything about your courses..."
+                  placeholder="Ask me anything..."
                   className="max-h-28 flex-1 resize-none bg-transparent py-2 text-sm outline-none placeholder:text-muted-foreground/70"
                 />
                 <button
@@ -236,17 +236,49 @@ function TypingIndicator() {
 
 function getAIResponse(input: string): string {
   const lower = input.toLowerCase();
+
+  // Academic / study help (still works seamlessly when asked)
   if (lower.includes('gpa')) {
     return "Your predicted GPA this semester is 3.74, up 0.21 from last month. You're trending toward Dean's List! The biggest lever right now is Data Structures — bringing that C+ up to a B would lift your GPA to 3.82.";
   }
   if (lower.includes('quiz')) {
     return "I can generate a quiz from any lecture, chapter, or your weak spots. Based on your last quizzes, carbonyl reactions and eigenvalues are your top two gaps. Want me to create a 15-question quiz on those now?";
   }
-  if (lower.includes('plan') || lower.includes('study')) {
+  if ((lower.includes('plan') || lower.includes('study')) && lower.length < 80) {
     return "Here's what I recommend for today: 1) Review carbonyl reactions (45 min) — your midterm is in 4 days. 2) Finish Problem Set 4 for Linear Algebra (60 min). 3) Read Chapter 8 on Binary Trees (40 min). Your focus peaks at 4 PM, so tackle the hardest task then. Shall I add these to your tasks?";
   }
-  if (lower.includes('summar')) {
+  if (lower.includes('summar') && lower.length < 60) {
     return "Sure! Upload a lecture recording, PDF, or paste your notes and I'll extract the key concepts, definitions, and takeaways into a clean summary you can review in minutes. Which course is it for?";
   }
-  return "Great question! I can help with summaries, study plans, quizzes, GPA predictions, and explaining concepts. Could you tell me a bit more about what you're working on so I can give you the best answer?";
+
+  // General-purpose responses
+  if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey')) {
+    return "Hello! How can I help you today? I can assist with coding, writing, research, math, general knowledge, casual conversation, or any academic topics you need help with.";
+  }
+  if (lower.includes('code') || lower.includes('program') || lower.includes('javascript') || lower.includes('python') || lower.includes('react') || lower.includes('bug')) {
+    return "I'd be happy to help with coding! I can assist with writing code, debugging, explaining concepts, reviewing architecture, and more. Could you share the specific problem or code snippet you're working with?";
+  }
+  if (lower.includes('write') || lower.includes('essay') || lower.includes('email') || lower.includes('letter')) {
+    return "I can help you write that! Whether it's an essay, email, cover letter, or creative piece, just give me the topic and any requirements (tone, length, audience) and I'll draft it for you.";
+  }
+  if (lower.includes('explain') || lower.includes('what is') || lower.includes('how does')) {
+    return "Great question! I can break down concepts in almost any field — science, history, technology, philosophy, economics, and more. Could you tell me which specific topic you'd like me to explain?";
+  }
+  if (lower.includes('math') || lower.includes('calculate') || lower.includes('solve') || lower.includes('equation')) {
+    return "I can help you solve that math problem step by step. Share the equation or problem you're working on and I'll walk you through the solution with clear explanations.";
+  }
+  if (lower.includes('recipe') || lower.includes('cook') || lower.includes('food')) {
+    return "I'd love to help with cooking! Tell me what ingredients you have or what dish you're thinking about, and I'll give you a recipe with step-by-step instructions.";
+  }
+  if (lower.includes('joke') || lower.includes('funny')) {
+    return "Why don't scientists trust atoms? Because they make up everything! But seriously, I'm here for any question you've got — from quantum physics to the best pizza recipe. What else can I help with?";
+  }
+  if (lower.includes('translate')) {
+    return "I can help with translation between many languages. Just provide the text and tell me which language you'd like it translated into!";
+  }
+  if (lower.includes('thank')) {
+    return "You're welcome! Feel free to ask me anything else — I'm here to help with whatever you need.";
+  }
+
+  return "I'm here to help with anything you need — coding, writing, research, math, general knowledge, casual conversation, or academic and study support. What would you like to know or work on?";
 }

@@ -313,12 +313,12 @@ export const motivationQuotes = [
 ];
 
 export const aiSuggestions = [
-  'Summarize my last Organic Chemistry lecture',
+  'Explain quantum entanglement simply',
+  'Help me debug a React useEffect issue',
+  'Write a professional email to my professor',
+  'What\'s the difference between TCP and UDP?',
   'Create a 3-day study plan for my midterm',
-  'Generate a quiz on eigenvalues',
-  'What should I study today?',
-  'Predict my GPA for this semester',
-  'Explain carbonyl reactions simply',
+  'Tell me a fun fact about the universe',
 ];
 
 export const navSections = [
